@@ -115,6 +115,7 @@ public class DirListerFrame extends JFrame {
         startButton = new JButton("Start");
         startButton.addActionListener(e -> {
             if (initialDir != null) {
+                logTextArea.setText("");
                 dirLister.setFirstDir(initialDir);
             }
         });
