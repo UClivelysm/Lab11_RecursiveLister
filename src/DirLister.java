@@ -35,7 +35,7 @@ public class DirLister {
             if (entry.isFile()) {
                 fileCount++;
                 report("File: " + entry.getName());
-                report(FilePicker.arbStreamFileRead(entry));
+//                report(FilePicker.arbStreamFileRead(entry));
             } else if (entry.isDirectory()) {
                 dirCount++;
                 report("Found subdirectory: " + entry.getName());
