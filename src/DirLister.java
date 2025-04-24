@@ -2,57 +2,49 @@ import java.io.File;
 
 public class DirLister {
     private int fileCount = 0;
-    private int dirCount = 0;
-    private boolean skipHidden = true; // New flag
+    private int dirCount  = 0;
+    private boolean skipHidden = false;
+    private final DirListerFrame frame;      // reference to GUI
+
+    public DirLister(DirListerFrame frame) {
+        this.frame = frame;
+    }
+
+    public void enableSkipHidden()  { skipHidden = true; }
+    public void disableSkipHidden() { skipHidden = false; }
 
     public void setFirstDir(File dir) {
-        fileCount = 0;
-        dirCount = 0;
-
-        reportToGui("Starting directory scan of: " + dir.getPath(), dirCount, fileCount);
+        fileCount = dirCount = 0;
+        report("Starting directory scan of: " + dir.getPath());
         readDir(dir);
-        reportToGui("Finished scanning directories.", dirCount, fileCount);
+        report("Finished scanning directories.");
     }
 
     private void readDir(File dir) {
-        reportToGui("Reading directory: " + dir.getPath(), dirCount, fileCount);
+        report("Reading directory: " + dir.getPath());
 
         File[] entries = dir.listFiles();
         if (entries == null) {
-            reportToGui("Could not list contents of: " + dir.getPath(), dirCount, fileCount);
+            report("Could not list contents of: " + dir.getPath());
             return;
         }
 
         for (File entry : entries) {
-            // Skip hidden files/directories starting with "."
-            if (skipHidden && entry.getName().startsWith(".")) {
-                continue;
-            }
+            if (skipHidden && entry.getName().startsWith(".")) continue;
 
             if (entry.isFile()) {
                 fileCount++;
-                String content = FilePicker.arbStreamFileRead(entry);
-                reportToGui("File: " + entry.getName(), dirCount, fileCount);
-                reportToGui(content, dirCount, fileCount);
+                report("File: " + entry.getName());
+                report(FilePicker.arbStreamFileRead(entry));
             } else if (entry.isDirectory()) {
                 dirCount++;
-                reportToGui("Found subdirectory: " + entry.getName(), dirCount, fileCount);
-                readDir(entry);  // recurse
+                report("Found subdirectory: " + entry.getName());
+                readDir(entry);                       // recurse
             }
         }
     }
 
-    private void reportToGui(String text, int dirCount, int fileCount) {
-        System.out.println(text);
-        System.out.println("Files: " + fileCount + ", Directories: " + dirCount);
-    }
-
-    // Setters to control hidden file skipping
-    public void enableSkipHidden() {
-        skipHidden = true;
-    }
-
-    public void disableSkipHidden() {
-        skipHidden = false;
+    private void report(String text) {
+        frame.updateValues(text, fileCount, dirCount); // single gateway to GUI
     }
 }
